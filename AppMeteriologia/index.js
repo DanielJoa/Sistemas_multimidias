@@ -1,10 +1,11 @@
+
 const container = document.querySelector('.container');
-const search = document.querySelector('.search-box button');
+const search = document.getElementById('search');
 const weatherBox = document.querySelector('.weather-box');
 const weatherDetails = document.querySelector('.weather-details');
 const error404 = document.querySelector('.not-found');
 
-search.addEventListener('click', () => {
+function searchFunction() {
 
     const APIKey = '8e60cbb055a6b0da9664c97a5733aaa1';
     const city = document.querySelector('.search-box input').value;
@@ -18,7 +19,6 @@ search.addEventListener('click', () => {
 
             if (json.cod === '404') {
                 container.style.height = '400px';
-                weatherBox.style.display = 'none';
                 weatherDetails.style.display = 'none';
                 error404.style.display = 'block';
                 error404.classList.add('fadeIn');
@@ -36,19 +36,19 @@ search.addEventListener('click', () => {
 
             switch (json.weather[0].main) {
                 case 'Clear':
-                    image.src = 'C:/Users/Daniel/Desktop/UNISO/Sistemas_Multimidias/AppMeteriologia/images/clear.png';
+                    image.src = 'images/clear.png';
                     break;
 
                 case 'Rain':
-                    image.src = 'C:/Users/Daniel/Desktop/UNISO/Sistemas_Multimidias/AppMeteriologia/images/rain.png';
+                    image.src = 'images/rain.png';
                     break;
 
                 case 'Clouds':
-                    image.src = 'C:/Users/Daniel/Desktop/UNISO/Sistemas_Multimidias/AppMeteriologia/images/cloud.png';
+                    image.src = 'images/cloud.png';
                     break;
 
                 case 'Haze':
-                    image.src = 'C:/Users/Daniel/Desktop/UNISO/Sistemas_Multimidias/AppMeteriologia/images/mist.png';
+                    image.src = 'images/mist.png';
                     break;
 
                 default:
@@ -66,8 +66,8 @@ search.addEventListener('click', () => {
             weatherDetails.classList.add('fadeIn');
             container.style.height = '590px';
 
-
         });
 
 
-});
+
+};

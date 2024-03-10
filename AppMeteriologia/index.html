@@ -1,51 +1,227 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="style.css"> 
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
     <script src="https://kit.fontawesome.com/7c8801c017.js" crossorigin="anonymous"></script>
-    <script src="index.js"></script>
-    <title>Meteriologia</title>
+    <title>Vontade de SMT (Shin Megami Tensei)</title>
 </head>
+
 <body>
+    <div class="spinner-container">
+        <div class="spinner">
+            <i class="fas fa-spinner"></i>
+        </div>
+    </div>
     <div class="container">
         <div class="search-box">
             <i class="fa-solid fa-location-dot"></i>
             <input type="text" placeholder="Busque por uma localização">
-            <button class="fa-solid fa-magnifying-glass"></button>
+            <button id="search" class="fa-solid fa-magnifying-glass" onclick="searchFunction()"></button>
         </div>
 
         <div class="not-found">
-            <img src="C:/Users/Daniel/Desktop/UNISO/Sistemas_Multimidias/AppMeteriologia/images/404.png">
+            <img src="images/404.png">
             <p>Localização inválida</p>
         </div>
-        <div class="weather-box">
-            <img src="">
-            <p class="temperature"></p>
-            <p class="description"></p>
-        </div>
 
-        <div class="weather-details">
-            <div class="humidity">
-                <i class="fa-solid fa-water"></i>
-                <div class="text">
-                    <span></span>
-                    <p>Umidade</p>
+        <div class="weather-info">
+            <div class="left-info">
+                <div class="weather-box">
+                    <img src="">
+                    <p class="temperature"></p>
+                    <p class="description"></p>
+                </div>
+
+                <div class="weather-details">
+                    <div class="humidity">
+                        <i class="fa-solid fa-water"></i>
+                        <div class="text">
+                            <span></span>
+                            <p>Umidade</p>
+                        </div>
+                    </div>
+                    <div class="wind">
+                        <i class="fa-solid fa-wind"></i>
+                        <div class="text">
+                            <span></span>
+                            <p>Velocidade do vento</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="wind">
-                <i class="fa-solid fa-wind"></i>
-                <div class="text">
-                    <span></span>
-                    <p>Velocidade do vento</p>
-                </div>
+
+            <div class="right-info">
+
+                <ul class="days-list">
+                    <li>
+                        <img class="img-min" id="1-img"></img>
+                        <span id="dia-1"></span>
+                        <span class="day-temp" id="1-temp"></span>
+                    </li>
+                    <li>
+                        <img class="img-min" id="2-img"></img>
+                        <span id="dia-2"></span>
+                        <span class="day-temp" id="2-temp"></span>
+                    </li>
+                    <li>
+                        <img class="img-min" id="3-img"></img>
+                        <span id="dia-3"></span>
+                        <span class="day-temp" id="3-temp"></span>
+                    </li>
+                    <li>
+                        <img class="img-min" id="4-img"></img>
+                        <span id="dia-4"></span>
+                        <span class="day-temp" id="4-temp"></span>
+                    </li>
+                </ul>
+            </div>
         </div>
 
     </div>
+
 </body>
+<script>
+
+    const container = document.querySelector('.container');
+    const spinnerContainer = document.querySelector('.spinner-container');
+    const search = document.getElementById('search');
+    const weatherInfo = document.querySelector('.weather-info');
+    const weatherBox = document.querySelector('.weather-box');
+    const weatherDetails = document.querySelector('.weather-details');
+    const error404 = document.querySelector('.not-found');
+
+    function searchFunction() {
+
+        const APIKey = '8e60cbb055a6b0da9664c97a5733aaa1';
+        const city = document.querySelector('.search-box input').value;
+
+        if (city === '')
+            return;
+
+        container.style.display = 'none';
+        spinnerContainer.style.display = 'flex';
+
+
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`)
+            .then(response => response.json())
+            .then(json => {
+
+                spinnerContainer.style.display = 'none';
+                container.style.display = 'BLOCK';
+
+                fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${APIKey}`)
+                    .then(response => response.json())
+                    .then(json => {
+                        var currentDate = new Date();
+                        var currentDay = currentDate.toISOString().split('T')[0];
+
+                        var filteredData = json.list.filter(function (item) {
+                            return item.dt_txt.includes("12:00:00") && !item.dt_txt.includes(currentDay);
+                        });
+
+                        console.log(filteredData);
+
+                        for (var i = 0; i < 4; i++) {
+                            // Update image
+                            var weatherIcon = document.getElementById((i + 1) + '-img');
+                            var weatherMain = filteredData[i].weather[0].main;
+
+                            switch (weatherMain) {
+                                case 'Clear':
+                                    weatherIcon.src = 'images/clear.png';
+                                    break;
+                                case 'Rain':
+                                    weatherIcon.src = 'images/rain.png';
+                                    break;
+                                case 'Clouds':
+                                    weatherIcon.src = 'images/cloud.png';
+                                    break;
+                                case 'Haze':
+                                    weatherIcon.src = 'images/mist.png';
+                                    break;
+                                default:
+                                    weatherIcon.src = '';
+                            }
+
+                            // Update day
+                            var dayElement = document.getElementById('dia-' + (i + 1));
+                            dayElement.textContent = new Date(filteredData[i].dt_txt).toLocaleDateString('en-US', { weekday: 'long' });
+
+                            // Update temperature
+                            var tempElement = document.getElementById((i + 1) + '-temp');
+                            tempElement.textContent = filteredData[i].main.temp + '°C';
+                        }
+                    });
+
+                if (json.cod === '404') {
+                    container.style.height = '400px';
+                    weatherInfo.style.display = 'none';
+                    weatherDetails.style.display = 'none';
+                    error404.style.display = 'block';
+                    error404.classList.add('fadeIn');
+                    return;
+                }
+
+                error404.style.display = 'none';
+                error404.classList.remove('fadeIn');
+
+                const image = document.querySelector('.weather-box img');
+                const temperature = document.querySelector('.weather-box .temperature');
+                const description = document.querySelector('.weather-box .description');
+                const humidity = document.querySelector('.weather-details .humidity span');
+                const wind = document.querySelector('.weather-details .wind span');
+
+                switch (json.weather[0].main) {
+                    case 'Clear':
+                        image.src = 'images/clear.png';
+                        break;
+
+                    case 'Rain':
+                        image.src = 'images/rain.png';
+                        break;
+
+                    case 'Clouds':
+                        image.src = 'images/cloud.png';
+                        break;
+
+                    case 'Haze':
+                        image.src = 'images/mist.png';
+                        break;
+
+                    default:
+                        image.src = '';
+                }
+
+                temperature.innerHTML = `${parseInt(json.main.temp)}<span>°C</span>`;
+                description.innerHTML = `${json.weather[0].description}`;
+                humidity.innerHTML = `${json.main.humidity}%`;
+                wind.innerHTML = `${parseInt(json.wind.speed)}Km/h`;
+
+                weatherInfo.style.display = '';
+                weatherBox.style.display = '';
+                weatherDetails.style.display = '';
+                weatherBox.classList.add('fadeIn');
+                weatherDetails.classList.add('fadeIn');
+                container.style.height = '590px';
+                container.style.width = '500px';
+
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                container.style.height = '400px';
+                weatherDetails.style.display = 'none';
+                error404.style.display = 'block';
+                error404.classList.add('fadeIn');
+                return;
+            });
+
+
+
+    };
+</script>
+
 </html>
